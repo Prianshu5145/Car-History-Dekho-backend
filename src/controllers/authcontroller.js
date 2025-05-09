@@ -10,9 +10,9 @@ const createToken = (user) =>
   jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
 const cookieOptions = {
   httpOnly: true,
-  secure: true, // Ensure you're using HTTPS in production
-  sameSite: "Strict",
-  maxAge: 1 * 24 * 60 * 60 * 1000, // 7 days
+  secure: true,        
+  sameSite: "None",   
+  maxAge: 1 * 24 * 60 * 60 * 1000,
 };
 
 
