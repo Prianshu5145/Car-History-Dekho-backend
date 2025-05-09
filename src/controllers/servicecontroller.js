@@ -82,51 +82,72 @@ exports.callService = async (req, res) => {
     await user.save();
 
     res.json({ data: response.data, newBalance: user.wallet });
-  } catch (err) {
+  }catch (err) {
     const statusCode = err.response?.status;
-
-   
-    if (serviceName === 'RC Verification' && statusCode === 404) {
+    const errorMessage = err.response?.data?.message || err.message || 'Unknown error';
+    const transactionId = generateTransactionId();
+  
+    let shouldDeduct = false;
+    let userMessage = `Response Failed, no amount deducted\n${errorMessage}`;
+    let transactionAmount = 0;
+    let transactionDescription = `Error - ${err.response?.status} ${errorMessage} - ${serviceName}`;
+  
+    // PAN Verification - 404 error: Deduct amount and show "Data not found"
+    if (serviceName === 'PAN Verification' && statusCode === 404) {
+      shouldDeduct = true;
+      userMessage = 'Data not found, Bad Request !';
+      transactionAmount = cost;
+      transactionDescription = serviceName;
+    }
+  
+    // RC Verification - 404 error: Deduct amount and show "No data found"
+    else if (serviceName === 'RC Verification' && statusCode === 404) {
+      shouldDeduct = true;
+      userMessage = 'No data found, Bad Request !';
+      transactionAmount = cost;
+      transactionDescription = serviceName;
+    }
+  
+    // Maruti or Hyundai - 500 error: No deduction, return "Data not found"
+    else if ((serviceName === 'Maruti Service' || serviceName === 'Hyundai Service') && statusCode === 500) {
+      userMessage = 'Data not found, Bad Request !';
+    }
+  
+    // Mahindra - 403 error: No deduction, return "Data not found"
+    else if (serviceName === 'Mahindra Service' && statusCode === 403) {
+      userMessage = 'Data not found, Bad Request !';
+    }
+  
+    // Apply deduction if allowed
+    if (shouldDeduct) {
       user.wallet -= cost;
-
-      const transactionId = generateTransactionId();
+  
       user.transactions.push({
         transactionId,
         date: new Date(),
-        description: serviceName,
+        description: transactionDescription,
         type: 'Debit',
-        amount: cost,
+        amount: transactionAmount,
         balance: user.wallet
       });
-
-      const transaction = new Transaction({
-        transactionId,
-        date: new Date(),
-        description: serviceName,
-        type: 'Debit',
-        amount: cost,
-        userid: req.user.id
-      });
-
-      await transaction.save();
+  
       await user.save();
-
-      return res.status(505).json({ message: 'No data found', newBalance: user.wallet });
     }
-
-    const transactionId = generateTransactionId();
+  
+    // Always save a transaction record, even for errors
     const transaction = new Transaction({
       transactionId,
       date: new Date(),
-      description: `Error ${err.message} ${serviceName}`,
-      type: 'Debit',
-      amount: cost,
+      description: transactionDescription,
+      type: shouldDeduct ? 'Debit Error' : 'Error',
+      amount: transactionAmount,
       userid: req.user.id
     });
-
+  
     await transaction.save();
-    console.error('Error calling service :', err.message || err);
-    res.status(500).json({error: `Response Failed, no amount deducted \n${err.message}` });
+  
+    console.error('Error calling service:', errorMessage);
+    return res.status(500).json({ message: userMessage, newBalance: user.wallet });
   }
 };
 

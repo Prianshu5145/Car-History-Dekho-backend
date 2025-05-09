@@ -17,7 +17,7 @@ connectDB();
 app.use(cookieParser());
 // Middleware to parse incoming JSON
 app.use(express.json());
-const allowedOrigins = ['https://carhistorydekho.com'];
+const allowedOrigins = ['https://carhistorydekho.com','http://localhost:3000'];
 
 app.use(cors({
   origin: function (origin, callback) {
