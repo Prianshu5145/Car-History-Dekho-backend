@@ -7,6 +7,8 @@ const auth = require('./src/routes/auth.js')
 const service = require('./src/routes/sevice.js')
 const cookieParser = require('cookie-parser');
 const wallet = require('./src/routes/wallet.js')
+const path = require('path');
+
 dotenv.config(); // Load environment variables
 
 // Initialize express app
@@ -34,6 +36,11 @@ app.use(cors({
 app.use('/api/user', auth);
 app.use('/api/service',service);
 app.use('/api/Payment', wallet);
+app.get('/static/uploads/h-Sample-file.pdf', (req, res) => {
+  res.setHeader('Content-Type', 'application/pdf');
+  res.sendFile(path.join(__dirname, 'public', 'uploads', 'h-Sample-file.pdf'));
+});
+
 // Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
