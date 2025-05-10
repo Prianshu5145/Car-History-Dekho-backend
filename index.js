@@ -20,8 +20,16 @@ app.use(cookieParser());
 // Middleware to parse incoming JSON
 app.use(express.json());
 
+const allowedOrigins = ['https://carhistorydekho.com', 'http://localhost:3000'];
+
 app.use(cors({
-  origin: 'https://carhistorydekho.com', // the exact domain of your frontend
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
