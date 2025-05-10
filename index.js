@@ -7,7 +7,7 @@ const auth = require('./src/routes/auth.js')
 const service = require('./src/routes/sevice.js')
 const cookieParser = require('cookie-parser');
 const wallet = require('./src/routes/wallet.js')
-const path = require('path');
+
 
 dotenv.config(); // Load environment variables
 
@@ -19,27 +19,16 @@ connectDB();
 app.use(cookieParser());
 // Middleware to parse incoming JSON
 app.use(express.json());
-const allowedOrigins = ['https://carhistorydekho.com','http://localhost:3000'];
 
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: 'https://carhistorydekho.com', // the exact domain of your frontend
   credentials: true
 }));
-
 
 app.use('/api/user', auth);
 app.use('/api/service',service);
 app.use('/api/Payment', wallet);
-app.get('/static/uploads/h-Sample-file.pdf', (req, res) => {
-  res.setHeader('Content-Type', 'application/pdf');
-  res.sendFile(path.join(__dirname, 'public', 'uploads', 'h-Sample-file.pdf'));
-});
+
 
 // Start the server
 const PORT = process.env.PORT || 5000;
