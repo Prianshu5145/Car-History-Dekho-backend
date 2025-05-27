@@ -14,6 +14,7 @@ const cookieOptions = {
   sameSite: "None",   
   maxAge: 1 * 24 * 60 * 60 * 1000,
 };
+const Transaction = require('../models/Transaction');
 
 
 
@@ -72,7 +73,9 @@ exports.logout = (req, res) => {
 
 exports.getTransactions = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId =  req.user.id;
+    
+   
 
     // Find and return transactions of allowed types, sorted by ascending date
     const transactions = await Transaction.find({
