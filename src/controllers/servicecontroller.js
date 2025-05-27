@@ -57,7 +57,7 @@ exports.callService = async (req, res) => {
     const response = await axios.post(apiUrl, payload, { headers });
 
     // Deduct amount and log transaction
-    user.wallet -= cost;
+    
 
     const transactionId = generateTransactionId();
     // user.transactions.push({
@@ -68,7 +68,7 @@ exports.callService = async (req, res) => {
     //   amount: cost,
     //   balance: user.wallet
     // });
-
+user.wallet -= cost;
     const transaction = new Transaction({
       transactionId,
       date: new Date(),

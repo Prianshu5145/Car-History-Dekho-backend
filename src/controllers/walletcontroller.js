@@ -47,14 +47,14 @@ exports.verifyPayment = async (req, res) => {
 
             // Add the transaction with the six-digit ID
             let transactionId = generateTransactionId();
-            user.transactions.push({
-                transactionId: transactionId, 
-                date: new Date(),
-                description: 'Wallet Recharge',
-                type: 'Credit',
-                amount: amount,
-                balance: user.wallet
-            });
+            // user.transactions.push({
+            //     transactionId: transactionId, 
+            //     date: new Date(),
+            //     description: 'Wallet Recharge',
+            //     type: 'Credit',
+            //     amount: amount,
+            //     balance: user.wallet
+            // });
 
            
 let transaction = new Transaction(
@@ -65,7 +65,8 @@ let transaction = new Transaction(
         description: 'Wallet Recharge',
         type: 'Credit',
         amount: amount,
-        userid: req.user.id
+        userid: req.user.id,
+        balance: user.wallet
     })
     await transaction.save();
     await user.save();
