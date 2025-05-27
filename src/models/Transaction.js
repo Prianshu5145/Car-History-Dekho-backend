@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+
 const transactionSchema = new mongoose.Schema({
     transactionId: {
         type: String,
@@ -15,7 +16,7 @@ const transactionSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['Credit', 'Debit','Error','Debit Error'],
+        enum: ['Credit', 'Debit', 'Error', 'Debit Error'],
         required: true
     },
     amount: {
@@ -25,6 +26,11 @@ const transactionSchema = new mongoose.Schema({
     userid: { 
         type: String,
         required: true
+    },
+    balance: {
+        type: Number,
+        required: true
     }
-}); 
+});
+
 module.exports = mongoose.model('Transaction', transactionSchema);

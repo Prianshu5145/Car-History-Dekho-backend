@@ -7,7 +7,7 @@ const auth = require('./src/routes/auth.js')
 const service = require('./src/routes/sevice.js')
 const cookieParser = require('cookie-parser');
 const wallet = require('./src/routes/wallet.js')
-
+const whatsapp = require('./src/routes/whatsappsenderroutes.js');
 
 dotenv.config(); // Load environment variables
 
@@ -36,6 +36,7 @@ app.use(cors({
 app.use('/api/user', auth);
 app.use('/api/service',service);
 app.use('/api/Payment', wallet);
+app.use('/api/message',whatsapp );
 
 
 // Start the server

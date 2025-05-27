@@ -60,14 +60,14 @@ exports.callService = async (req, res) => {
     user.wallet -= cost;
 
     const transactionId = generateTransactionId();
-    user.transactions.push({
-      transactionId,
-      date: new Date(),
-      description: serviceName,
-      type: 'Debit',
-      amount: cost,
-      balance: user.wallet
-    });
+    // user.transactions.push({
+    //   transactionId,
+    //   date: new Date(),
+    //   description: serviceName,
+    //   type: 'Debit',
+    //   amount: cost,
+    //   balance: user.wallet
+    // });
 
     const transaction = new Transaction({
       transactionId,
@@ -75,7 +75,8 @@ exports.callService = async (req, res) => {
       description: serviceName,
       type: 'Debit',
       amount: cost,
-      userid: req.user.id
+      userid: req.user.id,
+      balance: user.wallet
     });
 
     await transaction.save();
@@ -122,14 +123,14 @@ exports.callService = async (req, res) => {
     if (shouldDeduct) {
       user.wallet -= cost;
   
-      user.transactions.push({
-        transactionId,
-        date: new Date(),
-        description: transactionDescription,
-        type: 'Debit',
-        amount: transactionAmount,
-        balance: user.wallet
-      });
+      // user.transactions.push({
+      //   transactionId,
+      //   date: new Date(),
+      //   description: transactionDescription,
+      //   type: 'Debit',
+      //   amount: transactionAmount,
+      //   balance: user.wallet
+      // });
   
       await user.save();
     }
@@ -141,7 +142,8 @@ exports.callService = async (req, res) => {
       description: transactionDescription,
       type: shouldDeduct ? 'Debit Error' : 'Error',
       amount: transactionAmount,
-      userid: req.user.id
+      userid: req.user.id,
+      balance: user.wallet
     });
   
     await transaction.save();
