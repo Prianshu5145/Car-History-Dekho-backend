@@ -63,7 +63,12 @@ exports.googleLogin = async (req, res) => {
 
 
 exports.logout = (req, res) => {
-  res.clearCookie("token");
+  res.clearCookie('token', {
+  httpOnly: true,
+  secure: true,          // Only if using HTTPS
+  sameSite: 'None',      // Required for cross-site cookies
+  path: '/',             // Match cookie path
+});
   res.json({ message: "Logged out" });
 };
 

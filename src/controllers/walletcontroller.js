@@ -86,43 +86,64 @@ exports.getWalletBalance = async (req, res) => {
     const user = await User.findById(req.user.id);
     res.json({ balance: user.wallet });
 };
+
+
+
 exports.getTotalTransactions = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id); // Assuming req.userId is set via auth middleware
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    // Assuming `req.user.id` is available from authentication middleware
+    const userId = req.user.id;
 
-    const totalTransactions = user.transactions.length;
+    
+    // Count transactions where userid matches current user's ID
+    const totalTransactions = await Transaction.countDocuments({ userid: userId });
+
     res.json({ totalTransactions });
   } catch (err) {
-    console.error('Error fetching transactions:', err);
+    console.error('Error fetching total transactions:', err);
     res.status(500).json({ message: 'Internal Server Error' });
   }
 };
+
+
 exports.getTotalCreditUsed = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    const userId = req.user.id;
 
-    const creditUsed = user.transactions
-      .filter(txn => txn.type === 'Debit')
-      .reduce((sum, txn) => sum + txn.amount, 0);
+    
 
-    res.json({ totalCreditUsed: creditUsed });
+    // Aggregate debit transactions for the user and sum the amount
+    const result = await Transaction.aggregate([
+      { $match: { userid: userId, type: 'Debit' } },
+      { $group: { _id: null, total: { $sum: '$amount' } } }
+    ]);
+
+    const totalCreditUsed = result.length > 0 ? result[0].total : 0;
+
+    res.json({ totalCreditUsed });
   } catch (err) {
     console.error('Error calculating credit used:', err);
     res.status(500).json({ message: 'Internal Server Error' });
   }
 };
+
 exports.getTotalCreditAdded = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    const userId = req.user.id;
+
+    // Optional: Validate that user exists
+    const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    const creditAdded = user.transactions
-      .filter(txn => txn.type === 'Credit')
-      .reduce((sum, txn) => sum + txn.amount, 0);
+    // Aggregate 'Credit' transactions for the user and sum the amount
+    const result = await Transaction.aggregate([
+      { $match: { userid: userId, type: 'Credit' } },
+      { $group: { _id: null, total: { $sum: '$amount' } } }
+    ]);
 
-    res.json({ totalCreditAdded: creditAdded });
+    const totalCreditAdded = result.length > 0 ? result[0].total : 0;
+
+    res.json({ totalCreditAdded });
   } catch (err) {
     console.error('Error calculating credit added:', err);
     res.status(500).json({ message: 'Internal Server Error' });
