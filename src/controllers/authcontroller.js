@@ -7,13 +7,14 @@ const otpGenerator = require('otp-generator');
 const sendWhatsappOtp = require('../utils/sendWhatsappOtp');
 const sendEmail = require('../utils/sendEmail')
 const createToken = (user) => 
-  jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+  jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 const cookieOptions = {
   httpOnly: true,
-  secure: true,        
-  sameSite: "None",   
-  maxAge: 1 * 24 * 60 * 60 * 1000,
+  secure: true,
+  sameSite: "None",
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week in milliseconds
 };
+
 const Transaction = require('../models/Transaction');
 
 

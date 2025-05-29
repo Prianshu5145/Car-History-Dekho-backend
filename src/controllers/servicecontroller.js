@@ -68,8 +68,8 @@ exports.callService = async (req, res) => {
     //   amount: cost,
     //   balance: user.wallet
     // });
-user.wallet -= cost;
-    const transaction = new Transaction({
+      user.wallet -= cost;
+      const transaction = new Transaction({
       transactionId,
       date: new Date(),
       description: serviceName,
